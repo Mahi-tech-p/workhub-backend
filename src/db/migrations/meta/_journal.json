@@ -8,6 +8,13 @@
       "when": 1783519400562,
       "tag": "0000_magenta_roulette",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1783533819299,
+      "tag": "0001_marvelous_vulture",
+      "breakpoints": true
     }
   ]
 }
