@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-const hashRefreshToken = (token) => {
+const hashSHA256 = (token) => {
     return crypto
         .createHash("sha256")
         .update(token)
@@ -18,7 +18,7 @@ const generateSecureRandomBytes = (length = 32) => {
 };
 
 export {
-    hashRefreshToken,
+    hashSHA256,
     generateSecureRandomString,
     generateSecureRandomBytes,
 };

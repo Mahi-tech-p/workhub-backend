@@ -13,7 +13,31 @@ const register = asyncHandler(async (req, res) => {
         });
 
 })
+const login = asyncHandler(async (req, res) => {
+    const {
+        user,
+        accessToken,
+        refreshToken,
+    } = await authService.loginUser(req.body);
+
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Login successful",
+        data: {
+            user,
+            accessToken,
+        },
+    });
+});
 const authController = {
-    register
+    register,
+    login
 }
 export default authController;
