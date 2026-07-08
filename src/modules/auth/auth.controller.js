@@ -36,8 +36,17 @@ const login = asyncHandler(async (req, res) => {
         },
     });
 });
+const me = asyncHandler(async (req, res) => {
+    return res.status(200).json({
+        success: true,
+        message: "Current user fetched successfully",
+        data: req.user,
+    });
+});
+
 const authController = {
     register,
-    login
+    login,
+    me
 }
 export default authController;

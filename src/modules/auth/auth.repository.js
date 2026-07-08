@@ -30,8 +30,15 @@ const createUser = async ({ firstName, lastName, email, passwordHash }) => {
         );
     return result[0] ?? null;
 }
-
+const findUserByID = async (id) => {
+    const result = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, id))
+    return result[0] ?? null;
+}
 export const authRepository = {
     findUserByEmail,
-    createUser
+    createUser,
+    findUserByID
 }
