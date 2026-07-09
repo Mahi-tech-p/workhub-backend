@@ -15,6 +15,13 @@
       "when": 1783533819299,
       "tag": "0001_marvelous_vulture",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783605769173,
+      "tag": "0002_gigantic_zodiak",
+      "breakpoints": true
     }
   ]
 }
