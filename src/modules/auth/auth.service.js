@@ -80,8 +80,10 @@ const refreshAccessToken = async (refreshToken) => {
         payload = verifyRefreshToken(refreshToken);
 
     } catch (error) {
-        "Invalid or expired refresh token",
+        throw new UnauthorizedError(
+            "Invalid or expired refresh token",
             "INVALID_REFRESH_TOKEN"
+        )
     }
     const tokenHash = hashSHA256(refreshToken);
     const session = await refreshTokenRepository.findByHashToken(tokenHash);
@@ -113,17 +115,16 @@ const refreshAccessToken = async (refreshToken) => {
     const accessToken = generateAccessToken(user);
 
     const newrefreshToken = generateRefreshToken(user);
-    const newTokenHash = hashSHA256(refreshToken);
-    await db.transaction(async (tx) => {
-        await refreshTokenRepository.revokeByID(tx,session.id);
-        await refreshTokenRepository.create(tx,
-            {
-                userId: user.id,
-                tokenHash: newTokenHash,
-                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            }
-        )
-    })
+    const newTokenHash = hashSHA256(newrefreshToken);
+
+    await refreshTokenRepository.revokeByID(session.id);
+    await refreshTokenRepository.create(
+        {
+            userId: user.id,
+            tokenHash: newTokenHash,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        }
+    )
     return {
         accessToken,
         refreshToken: newrefreshToken,
