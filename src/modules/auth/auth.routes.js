@@ -9,4 +9,5 @@ router.post("/register", validate({body: registerSchema}) ,authController.regist
 router.post("/login", validate({ body: loginSchema }), authController.login)
 router.post("/refresh-token", authController.refreshAccessToken)
 router.get("/me", authenticate, authController.me);
+router.post("/logout", authController.logout);
 export default router;

@@ -59,12 +59,28 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             accessToken,
         },
     });
-    
+
+})
+
+
+const logout = asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    await authService.logoutUser(refreshToken);
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+    return res.status(200).json({
+        success: true,
+        message: "Logged out successfully",
+    });
 })
 const authController = {
     register,
     login,
     me,
-    refreshAccessToken
+    refreshAccessToken,
+    logout
 }
 export default authController;

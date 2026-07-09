@@ -89,7 +89,7 @@ const refreshAccessToken = async (refreshToken) => {
     const session = await refreshTokenRepository.findByHashToken(tokenHash);
     if (!session) {
         throw new UnauthorizedError(
-            "reresh token not found",
+            "refresh token not found",
             "INVALID_REFRESH_TOKEN"
         )
     }
@@ -132,9 +132,46 @@ const refreshAccessToken = async (refreshToken) => {
 
 }
 
+const logoutUser = async (refreshToken) => {
+    if (!refreshToken) {
+        throw new UnauthorizedError(
+            "Invalid or expired refresh token",
+            "REFRESH_TOKEN_REQUIRED"
+        )
+    }
+    let payload;
+    try {
+        payload = verifyRefreshToken(refreshToken)
+    } catch (error) {
+        throw new UnauthorizedError(
+            "Invalid or expired refresh token",
+            "INVALID_REFRESH_TOKEN"
+        )
+    }
+    const tokenHash = hashSHA256(refreshToken);
+
+    const session = await refreshTokenRepository.findByHashToken(tokenHash);
+    if (!session) {
+        throw new UnauthorizedError(
+            "Refresh token not found",
+            "INVALID_REFRESH_TOKEN"
+        )
+    }
+    if (session.revokedAt) {
+        throw new UnauthorizedError(
+            "Refresh token has been revoked",
+            "INVALID_REFRESH_TOKEN"
+        )
+    }
+    await refreshTokenRepository.revokeByID(session.id);
+    return;
+}
+
+
 const authService = {
     registerUser,
     loginUser,
-    refreshAccessToken
+    refreshAccessToken,
+    logoutUser
 }
 export default authService;
