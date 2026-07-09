@@ -34,6 +34,7 @@
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.11.0",
     "postgres": "^3.4.9",
+    "slugify": "^1.6.9",
     "socket.io": "^4.8.3",
     "ua-parser-js": "^2.0.10",
     "zod": "^4.4.3"
