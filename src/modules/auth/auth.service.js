@@ -167,11 +167,15 @@ const logoutUser = async (refreshToken) => {
     return;
 }
 
-
+const logoutAllSessions = async (userId) => {
+    await refreshTokenRepository.revokeAllByUserID(userId);
+    return
+}
 const authService = {
     registerUser,
     loginUser,
     refreshAccessToken,
-    logoutUser
+    logoutUser,
+    logoutAllSessions
 }
 export default authService;

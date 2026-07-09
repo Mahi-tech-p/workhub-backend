@@ -1,6 +1,6 @@
 import { db } from "../../db/index.js";
 import { refreshTokens } from "../../db/schema/refreshToken.js";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 const create = async (data) => {
     const result = await db
@@ -41,9 +41,24 @@ const updateLastUsed = async (id) => {
 
     return result[0] ?? null;
 };
+
+const revokeAllByUserID = async (userId) => {
+    const result = await db
+        .update(refreshTokens)
+        .set({
+            revokedAt: new Date(),
+        })
+        .where(and(
+            eq(refreshTokens.id, userId),
+            isNull(refreshTokens.revokedAt)
+        ))
+        .returning();
+    return result;
+}
 export const refreshTokenRepository = {
     create,
     findByHashToken,
     revokeByID,
-    updateLastUsed
+    updateLastUsed,
+    revokeAllByUserID
 };

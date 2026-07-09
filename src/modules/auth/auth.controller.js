@@ -76,11 +76,27 @@ const logout = asyncHandler(async (req, res) => {
         message: "Logged out successfully",
     });
 })
+
+const logoutAll = asyncHandler(async (req, res) => {
+    await authService.logoutAllSessions(req.user.id);
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Logged out from all devices successfully",
+    });
+
+})
 const authController = {
     register,
     login,
     me,
     refreshAccessToken,
-    logout
+    logout,
+    logoutAll
 }
 export default authController;

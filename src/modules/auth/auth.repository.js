@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../db/index.js";
 import { users } from "../../db/schema/users.js";
+import { refreshTokens } from "../../db/schema/refreshToken.js";
 
 const findUserByEmail = async (email) => {
     const result = await db
@@ -37,6 +38,8 @@ const findUserByID = async (id) => {
         .where(eq(users.id, id))
     return result[0] ?? null;
 }
+
+
 export const authRepository = {
     findUserByEmail,
     createUser,
