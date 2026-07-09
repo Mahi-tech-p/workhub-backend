@@ -1,13 +1,14 @@
 import { authRepository } from "./auth.repository.js"
 import bcrypt from "bcrypt";
 import ConflictError from "../../errors/ConflictError.js";
-import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.js";
+import { generateAccessToken, generateRefreshToken, verifyAccessToken, verifyRefreshToken } from "../../utils/jwt.js";
 import { hashSHA256 } from "../../utils/crypto.js";
-import {refreshTokenRepository }from "./refreshToken.repository.js";
+import { refreshTokenRepository } from "./refreshToken.repository.js";
 import UnauthorizedError from "../../errors/UnauthorizedError.js";
+import { db } from "../../db/index.js";
 
 const registerUser = async ({ firstName, lastName, email, password }) => {
-    
+
     const existingUser = await authRepository.findUserByEmail(email);
 
     if (existingUser) {
@@ -66,8 +67,73 @@ const loginUser = async ({ email, password }) => {
         refreshToken,
     };
 };
+
+const refreshAccessToken = async (refreshToken) => {
+    if (!refreshToken) {
+        throw new UnauthorizedError(
+            "Invalid or expired refresh token",
+            "INVALID_REFRESH_TOKEN"
+        )
+    }
+    let payload
+    try {
+        payload = verifyRefreshToken(refreshToken);
+
+    } catch (error) {
+        "Invalid or expired refresh token",
+            "INVALID_REFRESH_TOKEN"
+    }
+    const tokenHash = hashSHA256(refreshToken);
+    const session = await refreshTokenRepository.findByHashToken(tokenHash);
+    if (!session) {
+        throw new UnauthorizedError(
+            "reresh token not found",
+            "INVALID_REFRESH_TOKEN"
+        )
+    }
+    if (session.revokedAt) {
+        throw new UnauthorizedError(
+            "Refresh token has been revoked",
+            "INVALID_REFRESH_TOKEN"
+        )
+    }
+    if (session.expiresAt < new Date()) {
+        throw new UnauthorizedError(
+            "Refresh token has expired",
+            "INVALID_REFRESH_TOKEN"
+        )
+    }
+    const user = await authRepository.findUserByID(payload.sub);
+    if (!user) {
+        throw new UnauthorizedError(
+            "User Not Found",
+            "USER_NOT_FOUND"
+        )
+    }
+    const accessToken = generateAccessToken(user);
+
+    const newrefreshToken = generateRefreshToken(user);
+    const newTokenHash = hashSHA256(refreshToken);
+    await db.transaction(async (tx) => {
+        await refreshTokenRepository.revokeByID(tx,session.id);
+        await refreshTokenRepository.create(tx,
+            {
+                userId: user.id,
+                tokenHash: newTokenHash,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            }
+        )
+    })
+    return {
+        accessToken,
+        refreshToken: newrefreshToken,
+    }
+
+}
+
 const authService = {
     registerUser,
-    loginUser
+    loginUser,
+    refreshAccessToken
 }
 export default authService;

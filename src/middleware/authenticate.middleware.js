@@ -20,12 +20,17 @@ const authenticate = async (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-
+    if (!token) {
+        throw new UnauthorizedError(
+            "Access token is missing",
+            "ACCESS_TOKEN_MISSING"
+        );
+    }
     const payload = verifyAccessToken(token);
-    
+
     const user = await authRepository.findUserByID(payload.sub);
 
-   console.log("JWT Payload:", payload);
+    console.log("JWT Payload:", payload);
 
     if (!user) {
         throw new UnauthorizedError(

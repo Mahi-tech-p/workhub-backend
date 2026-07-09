@@ -19,7 +19,7 @@ const findByHashToken = async (token) => {
 
     return result[0] ?? null;
 }
-const revokeByID = async (id) => {
+const revokeByID = async (db ,id) => {
     const result = await db
         .update(refreshTokens)
         .set({
