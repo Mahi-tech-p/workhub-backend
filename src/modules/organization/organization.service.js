@@ -49,6 +49,11 @@ const createOrganization = async ({ name, userId }) => {
     }
 }
 
+const getOrganizationByUserId = async (userId) => {
+    const result = await organizationRepository.findByUserId(db, userId)
+    return result
+}
 export const organisationService = {
     createOrganization,
+    getOrganizationByUserId
 }

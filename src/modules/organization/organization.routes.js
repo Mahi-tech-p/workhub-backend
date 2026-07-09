@@ -7,5 +7,5 @@ import organizationController from "./organization.controller.js"
 const router = Router()
 
 router.post('/', authenticate, validate({ body: createOrganizationSchema }), organizationController.createOrganization)
-
+router.get('/',authenticate,organizationController.getOrganizations)
 export default router

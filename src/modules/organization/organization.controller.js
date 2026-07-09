@@ -14,8 +14,18 @@ const createOrganization = asyncHandler(async (req, res) => {
         data: organization,
     })
 })
+const getOrganizations = asyncHandler(async (req, res) => {
+    const userId = req.user.id
 
+    const result = await organisationService.getOrganizationByUserId(userId)
+    return res.status(200).json({
+        success: true,
+        message: "Organisation fetched Successfully",
+        data: result
+    })
+})
 const organizationController = {
-    createOrganization
+    createOrganization,
+    getOrganizations
 }
 export default organizationController
