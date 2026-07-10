@@ -3,25 +3,26 @@ import {
     uuid,
     timestamp,
     pgEnum,
-    uniqueIndex,
     index,
+    uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 import { users } from "./users.js";
-import { organizations } from "./organizations.js";
+import { projects } from "./projects.js";
 import { roleEnum } from "./enums.js";
 
 
-export const organizationMembers = pgTable(
-    "organization_members",
+
+export const projectMembers = pgTable(
+    "project_members",
     {
         id: uuid("id")
             .defaultRandom()
             .primaryKey(),
 
-        organizationId: uuid("organization_id")
+        projectId: uuid("project_id")
             .notNull()
-            .references(() => organizations.id, {
+            .references(() => projects.id, {
                 onDelete: "cascade",
             }),
 
@@ -42,18 +43,18 @@ export const organizationMembers = pgTable(
             .notNull(),
     },
     (table) => ({
-        organizationIdx: index(
-            "organization_members_organization_idx"
-        ).on(table.organizationId),
+        projectIdx: index(
+            "project_members_project_idx"
+        ).on(table.projectId),
 
         userIdx: index(
-            "organization_members_user_idx"
+            "project_members_user_idx"
         ).on(table.userId),
 
-        uniqueMemberIdx: uniqueIndex(
-            "organization_members_unique_member_idx"
+        uniqueProjectMemberIdx: uniqueIndex(
+            "project_members_unique_member_idx"
         ).on(
-            table.organizationId,
+            table.projectId,
             table.userId
         ),
     })
