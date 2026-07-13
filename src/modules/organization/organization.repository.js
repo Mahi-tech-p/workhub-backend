@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq ,and} from "drizzle-orm";
 import { organizationMembers } from "../../db/schema/organizationMembers.js";
 import { organizations } from "../../db/schema/organizations.js";
 import { db } from "../../db/index.js";
@@ -27,7 +27,7 @@ const findBySlug = async (database, slug) => {
     return result[0] ?? null;
 }
 const findByUserId = async (database, userId) => {
-    return await database
+    const result =  await database
         .select({
             id: organizations.id,
             name: organizations.name,
@@ -49,10 +49,35 @@ const findByUserId = async (database, userId) => {
         )
         .where(eq(organizationMembers.userId, userId))
         .orderBy(desc(organizations.createdAt));
+    return result;
 }
+const findMemberByUserId = async (
+    database,
+    organizationId,
+    userId
+) => {
+    const result = await database
+        .select()
+        .from(organizationMembers)
+        .where(
+            and(
+                eq(
+                    organizationMembers.organizationId,
+                    organizationId
+                ),
+                eq(
+                    organizationMembers.userId,
+                    userId
+                )
+            )
+        );
+
+    return result[0] ?? null;
+};
 export const organizationRepository = {
     createOrganization,
     addMemberToOrganization,
     findBySlug,
-    findByUserId
+    findByUserId,
+    findMemberByUserId
 }
