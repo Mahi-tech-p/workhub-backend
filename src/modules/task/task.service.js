@@ -126,9 +126,96 @@ const createTask = async ({
     return task;
 
 };
+const getTasksByList = async ({
+    listId,
+    userId,
+}) => {
+
+    const list = await listRepository.findById(
+        db,
+        listId
+    );
+
+    if (!list) {
+        throw new NotFoundError(
+            "List not found",
+            "LIST_NOT_FOUND"
+        );
+    }
+
+    const projectMember =
+        await projectRepository.findProjectMemberByUserId(
+            db,
+            list.projectId,
+            userId
+        );
+
+    if (!projectMember) {
+        throw new ForbiddenError(
+            "You do not have access to this project",
+            "PROJECT_ACCESS_DENIED"
+        );
+    }
+
+    return await taskRepository.findByListId(
+        db,
+        listId
+    );
+};
+
+const getTaskById = async ({
+    taskId,
+    userId,
+}) => {
+
+    // Find task
+    const task = await taskRepository.findById(
+        db,
+        taskId
+    );
+
+    if (!task) {
+        throw new NotFoundError(
+            "Task not found",
+            "TASK_NOT_FOUND"
+        );
+    }
+
+    // Find list
+    const list = await listRepository.findById(
+        db,
+        task.listId
+    );
+
+    if (!list) {
+        throw new NotFoundError(
+            "List not found",
+            "LIST_NOT_FOUND"
+        );
+    }
+
+    // Verify membership
+    const projectMember =
+        await projectRepository.findProjectMemberByUserId(
+            db,
+            list.projectId,
+            userId
+        );
+
+    if (!projectMember) {
+        throw new ForbiddenError(
+            "You do not have access to this task",
+            "TASK_ACCESS_DENIED"
+        );
+    }
+
+    return task;
+};
 
 const taskService = {
     createTask,
+    getTasksByList,
+    getTaskById
 };
 
 export default taskService;

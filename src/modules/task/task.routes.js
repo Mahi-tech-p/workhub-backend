@@ -8,6 +8,7 @@ import taskController from "./task.controller.js";
 import {
     createTaskSchema,
     listParamsSchema,
+    taskParamsSchema,
 } from "./task.validation.js";
 
 const router = Router();
@@ -20,6 +21,22 @@ router.post(
         body: createTaskSchema,
     }),
     taskController.createTask
+);
+router.get(
+    "/lists/:listId/tasks",
+    authenticate,
+    validate({
+        params: listParamsSchema,
+    }),
+    taskController.getTasksByList
+);
+router.get(
+    "/tasks/:taskId",
+    authenticate,
+    validate({
+        params: taskParamsSchema,
+    }),
+    taskController.getTaskById
 );
 
 export default router;
