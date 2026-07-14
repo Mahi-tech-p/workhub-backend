@@ -316,11 +316,69 @@ if (assigneeId !== undefined) updateData.assigneeId = assigneeId;
 
     return updatedTask;
 };
+const deleteTaskById = async ({
+    taskId,
+    userId,
+}) => {
+
+    const task = await taskRepository.findById(
+        db,
+        taskId
+    );
+
+    if (!task) {
+        throw new NotFoundError(
+            "Task not found",
+            "TASK_NOT_FOUND"
+        );
+    }
+
+    const list = await listRepository.findById(
+        db,
+        task.listId
+    );
+
+    if (!list) {
+        throw new NotFoundError(
+            "List not found",
+            "LIST_NOT_FOUND"
+        );
+    }
+
+    const projectMember =
+        await projectRepository.findProjectMemberByUserId(
+            db,
+            list.projectId,
+            userId
+        );
+
+    if (!projectMember) {
+        throw new ForbiddenError(
+            "You do not have access to this project",
+            "PROJECT_ACCESS_DENIED"
+        );
+    }
+
+    if (!["OWNER", "ADMIN"].includes(projectMember.role)) {
+        throw new ForbiddenError(
+            "You do not have permission to delete tasks",
+            "INSUFFICIENT_PERMISSIONS"
+        );
+    }
+
+    await taskRepository.remove(
+        db,
+        taskId
+    );
+
+    return;
+};
 const taskService = {
     createTask,
     getTasksByList,
     getTaskById,
-    updateTaskById
+    updateTaskById,
+    deleteTaskById
 };
 
 export default taskService;

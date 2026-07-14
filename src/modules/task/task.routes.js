@@ -48,4 +48,12 @@ router.patch(
     }),
     taskController.updateTask
 );
+router.delete(
+    "/tasks/:taskId",
+    authenticate,
+    validate({
+        params: taskParamsSchema,
+    }),
+    taskController.deleteTask
+);
 export default router;

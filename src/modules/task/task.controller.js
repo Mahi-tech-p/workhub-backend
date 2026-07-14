@@ -70,11 +70,27 @@ const updateTask = asyncHandler(async (req, res) => {
     });
 
 });
+const deleteTask = asyncHandler(async (req, res) => {
+
+    const { taskId } = req.params;
+
+    await taskService.deleteTaskById({
+        taskId,
+        userId: req.user.id,
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Task deleted successfully",
+    });
+
+});
 const taskController = {
     createTask,
     getTasksByList,
     getTaskById,
-    updateTask
+    updateTask,
+    deleteTask
 };
 
 export default taskController;
