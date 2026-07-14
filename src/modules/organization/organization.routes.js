@@ -11,13 +11,10 @@ const router = Router()
 router.post('/', authenticate, validate({ body: createOrganizationSchema }), organizationController.createOrganization)
 router.get('/', authenticate, organizationController.getOrganizations)
 
-router.post(
-    "/:organizationId/projects",
-    authenticate,
-    validate({
-        params: organizationParamsSchema,
-        body: createProjectSchema,
-    }),
+router.post("/:organizationId/projects",authenticate,validate({params: organizationParamsSchema,body: createProjectSchema,}),
     projectController.createProject
 );
+router.get("/:organizationId/projects",authenticate,validate({params: organizationParamsSchema,}),
+    projectController.getProjects
+)
 export default router

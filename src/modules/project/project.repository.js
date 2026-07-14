@@ -45,7 +45,13 @@ const findById = async (database, projectId) => {
 
 const findByOrganizationId = async (database, organizationId) => {
     return await database
-        .select()
+        .select(
+           {   id: projects.id,
+            name: projects.name,
+            slug: projects.slug,
+            description: projects.description,
+            createdAt: projects.createdAt,}
+        )
         .from(projects)
         .where(eq(projects.organizationId, organizationId))
         .orderBy(desc(projects.createdAt));

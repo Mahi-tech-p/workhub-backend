@@ -95,8 +95,25 @@ const createProject = async ({
     }
 };
 
+const getProjects = async({
+    organizationId, userId
+}) => {
+    const member = await organizationRepository.findMemberByUserId(db, organizationId, userId)
+     if (!member) {
+        throw new NotFoundError(
+            "Organization not found or you are not a member",
+            "ORGANIZATION_NOT_FOUND"
+        );
+    }
+
+    return await projectRepository.findByOrganizationId(
+        db,
+        organizationId
+    );
+}
 const projectService = {
     createProject,
+    getProjects
 };
 
 export default projectService;
