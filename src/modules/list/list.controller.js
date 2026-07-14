@@ -18,9 +18,23 @@ const createList = asyncHandler(async (req, res) => {
         data: list,
     });
 });
+const getLists = asyncHandler(async (req, res) => {
+    const { projectId } = req.params;
 
+    const lists = await listService.getLists({
+        projectId,
+        userId: req.user.id,
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Lists fetched successfully",
+        data: lists,
+    });
+});
 const listController = {
     createList,
+    getLists
 };
 
 export default listController;

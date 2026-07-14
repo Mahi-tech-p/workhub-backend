@@ -15,8 +15,8 @@ import { createListSchema } from "../list/list.validation.js";
 const router = Router();
 
 router.get("/:projectId", authenticate, validate({ params: projectParamsSchema }), projectController.getProjectById)
-
-router.get("/:projectId/lists", authenticate,
+console.log("/:projectId/lists", "these is hiiting")
+router.post("/:projectId/lists", authenticate,
     validate({
         params: projectParamsSchema,
         body: createListSchema,

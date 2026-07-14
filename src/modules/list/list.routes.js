@@ -10,7 +10,8 @@ import {
 } from "./list.validation.js";
 
 const router = Router();
-
+console.log("LIST ROUTES LOADED");
+console.log("Registering POST /:projectId/lists");
 router.post(
     "/:projectId/lists",
     authenticate,
@@ -19,6 +20,14 @@ router.post(
         body: createListSchema,
     }),
     listController.createList
+);
+router.get(
+    "/:projectId/lists",
+    authenticate,
+    validate({
+        params: projectParamsSchema,
+    }),
+    listController.getLists
 );
 
 export default router;

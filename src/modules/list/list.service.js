@@ -90,9 +90,37 @@ const createList = async ({
         throw error;
     }
 };
+const getLists = async ({ projectId, userId }) => {
+    const project = await projectRepository.findById(db, projectId);
 
+    if (!project) {
+        throw new NotFoundError(
+            "Project not found",
+            "PROJECT_NOT_FOUND"
+        );
+    }
+
+    const member = await projectRepository.findProjectMemberByUserId(
+        db,
+        projectId,
+        userId
+    );
+
+    if (!member) {
+        throw new ForbiddenError(
+            "You do not have access to this project",
+            "PROJECT_ACCESS_DENIED"
+        );
+    }
+
+    return await listRepository.findByProjectId(
+        db,
+        projectId
+    );
+};
 const listService = {
     createList,
+    getLists
 };
 
 export default listService;
