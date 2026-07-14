@@ -29,6 +29,13 @@
       "when": 1783708207612,
       "tag": "0003_mature_wolfsbane",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783994805561,
+      "tag": "0004_chunky_fantastic_four",
+      "breakpoints": true
     }
   ]
 }

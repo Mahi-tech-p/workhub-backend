@@ -9,9 +9,17 @@ import {
     organizationParamsSchema,
     projectParamsSchema,
 } from "./project.validation.js";
+import listController from "../list/list.controller.js";
+import { createListSchema } from "../list/list.validation.js";
 
 const router = Router();
 
-router.get("/:projectId", authenticate, validate({params:projectParamsSchema}), projectController.getProjectById)
+router.get("/:projectId", authenticate, validate({ params: projectParamsSchema }), projectController.getProjectById)
 
+router.get("/:projectId/lists", authenticate,
+    validate({
+        params: projectParamsSchema,
+        body: createListSchema,
+    }),
+    listController.createList)
 export default router;
