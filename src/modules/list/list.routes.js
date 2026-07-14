@@ -6,14 +6,16 @@ import validate from "../../middleware/validate.middleware.js";
 import listController from "./list.controller.js";
 import {
     createListSchema,
+    listParamsSchema,
     projectParamsSchema,
+    updateListSchema,
 } from "./list.validation.js";
 
 const router = Router();
-console.log("LIST ROUTES LOADED");
-console.log("Registering POST /:projectId/lists");
+// console.log("LIST ROUTES LOADED");
+// console.log("Registering POST /:projectId/lists");
 router.post(
-    "/:projectId/lists",
+    "/projects/:projectId/lists",
     authenticate,
     validate({
         params: projectParamsSchema,
@@ -22,12 +24,29 @@ router.post(
     listController.createList
 );
 router.get(
-    "/:projectId/lists",
+    "/projects/:projectId/lists",
     authenticate,
     validate({
         params: projectParamsSchema,
     }),
     listController.getLists
+);
+router.get(
+    "/lists/:listId",
+    authenticate,
+    validate({
+        params: listParamsSchema,
+    }),
+    listController.getListById
+);
+router.patch(
+    "/lists/:listId",
+    authenticate,
+    validate({
+        params: listParamsSchema,
+        body: updateListSchema,
+    }),
+    listController.updateList
 );
 
 export default router;

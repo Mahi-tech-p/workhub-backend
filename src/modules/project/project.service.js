@@ -20,8 +20,8 @@ const createProject = async ({
         strict: true,
         trim: true,
     });
-    console.log("organizationId:", organizationId);
-    console.log("userId:", userId);
+    // console.log("organizationId:", organizationId);
+    // console.log("userId:", userId);
     // Verify user belongs to organization
     const member = await organizationRepository.findMemberByUserId(
         db,
@@ -29,7 +29,7 @@ const createProject = async ({
         userId
     );
 
-    console.log("Member:", member);
+    // console.log("Member:", member);
     if (!member) {
         throw new NotFoundError(
             "Organization not found",

@@ -1,29 +1,29 @@
 import { ZodError } from "zod";
 import { ValidationError } from "../errors/index.js";
-console.log("VALIDATE MIDDLEWARE LOADED");
+// console.log("VALIDATE MIDDLEWARE LOADED");
 const validate = ({ body, params, query } = {}) => {
-     console.log({
-        body,
-        params,
-        query,
-    });
+    //  console.log({
+    //     body,
+    //     params,
+    //     query,
+    // });
     return async (req, res, next) => {
-        console.log("VALIDATE CALLED", req.method, req.originalUrl);
-         console.log("Inside middleware");
-        console.log("req.params:", req.params);
+        // console.log("VALIDATE CALLED", req.method, req.originalUrl);
+        //  console.log("Inside middleware");
+        // console.log("req.params:", req.params);
         try {
             if (body) {
-                console.log("Parsing body...");
+               // console.log("Parsing body...");
                 req.body = await body.parseAsync(req.body);
             }
 
             if (params) {
-                console.log("Parsing params...");
+                //console.log("Parsing params...");
                 req.params = await params.parseAsync(req.params);
             }
 
             if (query) {
-                console.log("Parsing query...");
+               // console.log("Parsing query...");
                 req.query = await query.parseAsync(req.query);
             }
 
@@ -45,7 +45,7 @@ const validate = ({ body, params, query } = {}) => {
                     )
                 );
             }
-            console.log("Validation error:", error);
+           // console.log("Validation error:", error);
             next(error);
         }
     };

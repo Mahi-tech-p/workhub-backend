@@ -10,9 +10,7 @@ const router = Router();
 router.use("/auth", authRoutes)
 
 router.use("/organizations", organizationRoutes)
-router.use("/projects", projectRoutes)
-
-
-router.use("/projects", listRoutes);
+router.use("/projects", projectRoutes);
+router.use("/", listRoutes);
 
 export default router;

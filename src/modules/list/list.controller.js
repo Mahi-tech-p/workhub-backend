@@ -32,9 +32,43 @@ const getLists = asyncHandler(async (req, res) => {
         data: lists,
     });
 });
+const getListById = asyncHandler(async (req, res) => {
+
+    const { listId } = req.params;
+
+    const list = await listService.getListById({
+        listId,
+        userId: req.user.id,
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "List fetched successfully",
+        data: list,
+    });
+
+});
+const updateList = asyncHandler(async (req, res) => {
+    const { listId } = req.params;
+    const { name } = req.body;
+
+    const list = await listService.updateListById({
+        listId,
+        name,
+        userId: req.user.id,
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "List updated successfully",
+        data: list,
+    });
+});
 const listController = {
     createList,
-    getLists
+    getLists,
+    getListById,
+    updateList
 };
 
 export default listController;

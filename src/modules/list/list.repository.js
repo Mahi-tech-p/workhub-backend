@@ -13,7 +13,15 @@ const create = async (database, data) => {
 
 const findById = async (database, listId) => {
     const result = await database
-        .select()
+        .select({
+            id: lists.id,
+            projectId: lists.projectId,
+            name: lists.name,
+            position: lists.position,
+            createdBy: lists.createdBy,
+            createdAt: lists.createdAt,
+            updatedAt: lists.updatedAt,
+        })
         .from(lists)
         .where(eq(lists.id, listId));
 

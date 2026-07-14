@@ -30,7 +30,7 @@ const authenticate = async (req, res, next) => {
 
     const user = await authRepository.findUserByID(payload.sub);
 
-    console.log("JWT Payload:", payload);
+    // console.log("JWT Payload:", payload);
 
     if (!user) {
         throw new UnauthorizedError(
