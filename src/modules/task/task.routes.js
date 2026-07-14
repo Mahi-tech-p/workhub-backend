@@ -8,6 +8,7 @@ import taskController from "./task.controller.js";
 import {
     createTaskSchema,
     listParamsSchema,
+    moveTaskSchema,
     reorderTasksSchema,
     taskParamsSchema,
     updateTaskSchema,
@@ -31,6 +32,15 @@ router.get(
         params: listParamsSchema,
     }),
     taskController.getTasksByList
+);
+router.patch(
+    "/tasks/:taskId/move",
+    authenticate,
+    validate({
+        params: taskParamsSchema,
+        body: moveTaskSchema,
+    }),
+    taskController.moveTask
 );
 router.get(
     "/tasks/:taskId",

@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, max } from "drizzle-orm";
+import { and, asc, eq, inArray, max, gte, sql } from "drizzle-orm";
 
 import { tasks } from "../../db/schema/tasks.js";
 
@@ -108,6 +108,40 @@ const findByTitle = async (
 
     return result[0] ?? null;
 };
+const incrementPositionsFrom = async (
+    database,
+    listId,
+    position
+) => {
+    await database
+        .update(tasks)
+        .set({
+            position: sql`${tasks.position} + 1`,
+        })
+        .where(
+            and(
+                eq(tasks.listId, listId),
+                gte(tasks.position, position)
+            )
+        );
+};
+const decrementPositionsAfter = async (
+    database,
+    listId,
+    position
+) => {
+    await database
+        .update(tasks)
+        .set({
+            position: sql`${tasks.position} - 1`,
+        })
+        .where(
+            and(
+                eq(tasks.listId, listId),
+                gte(tasks.position, position + 1)
+            )
+        );
+};
 export const taskRepository = {
     create,
     findById,
@@ -118,4 +152,6 @@ export const taskRepository = {
     updatePosition,
     remove,
     findByTitle,
+    incrementPositionsFrom,
+    decrementPositionsAfter
 };

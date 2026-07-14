@@ -471,13 +471,122 @@ const reorderTasks = async ({
     });
 
 };
+const moveTask = async ({
+    taskId,
+    destinationListId,
+    position,
+    userId,
+}) => {
+
+    // Find task
+    const task = await taskRepository.findById(
+        db,
+        taskId
+    );
+
+    if (!task) {
+        throw new NotFoundError(
+            "Task not found",
+            "TASK_NOT_FOUND"
+        );
+    }
+
+    // Source list
+    const sourceList =
+        await listRepository.findById(
+            db,
+            task.listId
+        );
+
+    if (!sourceList) {
+        throw new NotFoundError(
+            "Source list not found",
+            "LIST_NOT_FOUND"
+        );
+    }
+
+    // Destination list
+    const destinationList =
+        await listRepository.findById(
+            db,
+            destinationListId
+        );
+
+    if (!destinationList) {
+        throw new NotFoundError(
+            "Destination list not found",
+            "LIST_NOT_FOUND"
+        );
+    }
+
+    // Prevent cross-project moves
+    if (
+        sourceList.projectId !==
+        destinationList.projectId
+    ) {
+        throw new ConflictError(
+            "Cannot move task across projects",
+            "INVALID_MOVE"
+        );
+    }
+
+    // Permission
+    const member =
+        await projectRepository.findProjectMemberByUserId(
+            db,
+            sourceList.projectId,
+            userId
+        );
+
+    if (!member) {
+        throw new ForbiddenError(
+            "Project access denied",
+            "PROJECT_ACCESS_DENIED"
+        );
+    }
+
+    if (!["OWNER", "ADMIN"].includes(member.role)) {
+        throw new ForbiddenError(
+            "Insufficient permissions",
+            "INSUFFICIENT_PERMISSIONS"
+        );
+    }
+
+    await db.transaction(async (tx) => {
+
+        // Close gap in source list
+        await taskRepository.decrementPositionsAfter(
+            tx,
+            task.listId,
+            task.position
+        );
+
+        // Make room in destination list
+        await taskRepository.incrementPositionsFrom(
+            tx,
+            destinationListId,
+            position
+        );
+
+        // Move task
+        await taskRepository.updatePosition(
+            tx,
+            taskId,
+            position,
+            destinationListId
+        );
+
+    });
+
+};
 const taskService = {
     createTask,
     getTasksByList,
     getTaskById,
     updateTaskById,
     deleteTaskById,
-    reorderTasks
+    reorderTasks,
+    moveTask
 };
 
 export default taskService;
