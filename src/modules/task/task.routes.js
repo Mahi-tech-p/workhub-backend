@@ -9,6 +9,7 @@ import {
     createTaskSchema,
     listParamsSchema,
     taskParamsSchema,
+    updateTaskSchema,
 } from "./task.validation.js";
 
 const router = Router();
@@ -38,5 +39,13 @@ router.get(
     }),
     taskController.getTaskById
 );
-
+router.patch(
+    "/tasks/:taskId",
+    authenticate,
+    validate({
+        params: taskParamsSchema,
+        body: updateTaskSchema,
+    }),
+    taskController.updateTask
+);
 export default router;

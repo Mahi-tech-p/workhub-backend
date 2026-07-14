@@ -52,10 +52,29 @@ const getTaskById = asyncHandler(async (req, res) => {
     });
 
 });
+const updateTask = asyncHandler(async (req, res) => {
+
+    const { taskId } = req.params;
+
+    const task =
+        await taskService.updateTaskById({
+            taskId,
+            ...req.body,
+            userId: req.user.id,
+        });
+
+    return res.status(200).json({
+        success: true,
+        message: "Task updated successfully",
+        data: task,
+    });
+
+});
 const taskController = {
     createTask,
     getTasksByList,
-    getTaskById
+    getTaskById,
+    updateTask
 };
 
 export default taskController;
