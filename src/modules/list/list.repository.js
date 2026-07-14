@@ -1,4 +1,4 @@
-import { and, desc, eq, max } from "drizzle-orm";
+import { and, desc, eq, inArray, max } from "drizzle-orm";
 
 import { lists } from "../../db/schema/list.js";
 
@@ -87,6 +87,29 @@ const remove = async (database, listId) => {
     return result[0] ?? null;
 };
 
+const findByIds = async (database, ids) => {
+    return await database
+        .select()
+        .from(lists)
+        .where(inArray(lists.id, ids));
+};
+
+const updatePosition = async (
+    database,
+    listId,
+    position
+) => {
+    const result = await database
+        .update(lists)
+        .set({
+            position,
+        })
+        .where(eq(lists.id, listId))
+        .returning();
+
+    return result[0] ?? null;
+};
+
 export const listRepository = {
     create,
     findById,
@@ -95,4 +118,6 @@ export const listRepository = {
     getMaxPosition,
     update,
     remove,
+    findByIds,
+    updatePosition
 };

@@ -64,11 +64,27 @@ const updateList = asyncHandler(async (req, res) => {
         data: list,
     });
 });
+const deleteList = asyncHandler(async (req, res) => {
+
+    const { listId } = req.params;
+
+    await listService.deleteListById({
+        listId,
+        userId: req.user.id,
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "List deleted successfully",
+    });
+
+});
 const listController = {
     createList,
     getLists,
     getListById,
-    updateList
+    updateList,
+    deleteList
 };
 
 export default listController;

@@ -48,5 +48,13 @@ router.patch(
     }),
     listController.updateList
 );
+router.delete(
+    "/lists/:listId",
+    authenticate,
+    validate({
+        params: listParamsSchema,
+    }),
+    listController.deleteList
+);
 
 export default router;

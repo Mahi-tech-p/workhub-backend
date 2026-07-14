@@ -24,3 +24,13 @@ export const projectParamsSchema = z.object({
 export const listParamsSchema = z.object({
     listId: z.uuid("Invalid list id"),
 });
+export const reorderListsSchema = z.object({
+    lists: z
+        .array(
+            z.object({
+                id: z.uuid(),
+                position: z.number().int().positive(),
+            })
+        )
+        .min(1),
+});

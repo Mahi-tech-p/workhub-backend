@@ -213,12 +213,58 @@ const updateListById = async ({
 
     return updatedList;
 };
+const deleteListById = async ({
+    listId,
+    userId,
+}) => {
+
+    const list = await listRepository.findById(
+        db,
+        listId
+    );
+
+    if (!list) {
+        throw new NotFoundError(
+            "List not found",
+            "LIST_NOT_FOUND"
+        );
+    }
+
+    const projectMember =
+        await projectRepository.findProjectMemberByUserId(
+            db,
+            list.projectId,
+            userId
+        );
+
+    if (!projectMember) {
+        throw new ForbiddenError(
+            "You do not have access to this list",
+            "LIST_ACCESS_DENIED"
+        );
+    }
+
+    if (!["OWNER", "ADMIN"].includes(projectMember.role)) {
+        throw new ForbiddenError(
+            "You do not have permission to delete this list",
+            "INSUFFICIENT_PERMISSIONS"
+        );
+    }
+
+    await listRepository.remove(
+        db,
+        listId
+    );
+
+    return;
+};
 
 const listService = {
     createList,
     getLists,
     getListById,
-    updateListById
+    updateListById,
+    deleteListById
 };
 
 export default listService;
