@@ -19,3 +19,6 @@ export const organizationParamsSchema = z.object({
     organizationId: z
         .uuid("Invalid organization id"),
 });
+export const projectParamsSchema = z.object({
+    projectId: z.string().uuid("Invalid project id"),
+});

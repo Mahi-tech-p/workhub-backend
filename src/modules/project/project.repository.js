@@ -36,7 +36,16 @@ const findBySlug = async (database, organizationId, slug) => {
 
 const findById = async (database, projectId) => {
     const result = await database
-        .select()
+        .select(
+            {  id: projects.id,
+            organizationId: projects.organizationId,
+            name: projects.name,
+            slug: projects.slug,
+            description: projects.description,
+            createdBy: projects.createdBy,
+            createdAt: projects.createdAt,
+            updatedAt: projects.updatedAt,}
+        )
         .from(projects)
         .where(eq(projects.id, projectId));
 
@@ -80,6 +89,23 @@ const findMemberByUserId = async (
 
     return result[0] ?? null;
 };
+const findProjectMemberByUserId = async (
+    database,
+    projectId,
+    userId
+) => {
+    const result = await database
+        .select()
+        .from(projectMembers)
+        .where(
+            and(
+                eq(projectMembers.projectId, projectId),
+                eq(projectMembers.userId, userId)
+            )
+        );
+
+    return result[0] ?? null;
+};
 
 export const projectRepository = {
     createProject,
@@ -87,5 +113,6 @@ export const projectRepository = {
     findBySlug,
     findById,
     findByOrganizationId,
-    findMemberByUserId
+    findMemberByUserId,
+    findProjectMemberByUserId
 };

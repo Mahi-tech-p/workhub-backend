@@ -7,18 +7,11 @@ import projectController from "./project.controller.js";
 import {
     createProjectSchema,
     organizationParamsSchema,
+    projectParamsSchema,
 } from "./project.validation.js";
 
 const router = Router();
 
-router.post(
-    "/organizations/:organizationId/projects",
-    authenticate,
-    validate({
-        params: organizationParamsSchema,
-        body: createProjectSchema,
-    }),
-    projectController.createProject
-);
+router.get("/:projectId", authenticate, validate({params:projectParamsSchema}), projectController.getProjectById)
 
 export default router;

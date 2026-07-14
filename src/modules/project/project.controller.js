@@ -35,9 +35,26 @@ const getProjects = asyncHandler(async (req, res) => {
     });
 
 })
+const getProjectById = asyncHandler(async (req, res) => {
+
+    const { projectId } = req.params;
+
+    const project = await projectService.getProjectsByID({
+        projectId,
+        userId: req.user.id,
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Project fetched successfully",
+        data: project,
+    });
+
+});
 const projectController = {
     createProject,
-    getProjects
+    getProjects,
+    getProjectById
 };
 
 export default projectController;
