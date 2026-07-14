@@ -36,6 +36,13 @@
       "when": 1783994805561,
       "tag": "0004_chunky_fantastic_four",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1784043476049,
+      "tag": "0005_crazy_polaris",
+      "breakpoints": true
     }
   ]
 }
