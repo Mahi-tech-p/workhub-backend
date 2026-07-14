@@ -8,6 +8,7 @@ import {
     createListSchema,
     listParamsSchema,
     projectParamsSchema,
+    reorderListsSchema,
     updateListSchema,
 } from "./list.validation.js";
 
@@ -40,6 +41,14 @@ router.get(
     listController.getListById
 );
 router.patch(
+    "/lists/reorder",
+    authenticate,
+    validate({
+        body: reorderListsSchema,
+    }),
+    listController.reorderLists
+);
+router.patch(
     "/lists/:listId",
     authenticate,
     validate({
@@ -56,5 +65,6 @@ router.delete(
     }),
     listController.deleteList
 );
+
 
 export default router;

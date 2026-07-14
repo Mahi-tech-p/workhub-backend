@@ -259,12 +259,98 @@ const deleteListById = async ({
     return;
 };
 
+const reorderLists = async ({
+    lists,
+    userId,
+}) => {
+
+    const listIds = lists.map((list) => list.id);
+
+    // Fetch all lists
+    const existingLists =
+        await listRepository.findByIds(
+            db,
+            listIds
+        );
+
+    if (existingLists.length !== listIds.length) {
+        throw new NotFoundError(
+            "One or more lists not found",
+            "LIST_NOT_FOUND"
+        );
+    }
+
+    // Verify all belong to same project
+    const projectId = existingLists[0].projectId;
+
+    const sameProject = existingLists.every(
+        (list) => list.projectId === projectId
+    );
+
+    if (!sameProject) {
+        throw new ForbiddenError(
+            "Lists must belong to the same project",
+            "INVALID_LISTS"
+        );
+    }
+
+    // Verify membership
+    const member =
+        await projectRepository.findProjectMemberByUserId(
+            db,
+            projectId,
+            userId
+        );
+
+    if (!member) {
+        throw new ForbiddenError(
+            "You do not have access to this project",
+            "PROJECT_ACCESS_DENIED"
+        );
+    }
+
+    // Verify permission
+    if (!["OWNER", "ADMIN"].includes(member.role)) {
+        throw new ForbiddenError(
+            "You do not have permission to reorder lists",
+            "INSUFFICIENT_PERMISSIONS"
+        );
+    }
+
+    // Ensure unique positions
+    const positions = lists.map((list) => list.position);
+
+    if (new Set(positions).size !== positions.length) {
+        throw new ConflictError(
+            "Duplicate positions are not allowed",
+            "INVALID_POSITIONS"
+        );
+    }
+
+    // Update all lists inside a transaction
+    await db.transaction(async (tx) => {
+
+        for (const list of lists) {
+
+            await listRepository.updatePosition(
+                tx,
+                list.id,
+                list.position
+            );
+
+        }
+
+    });
+
+};
+
 const listService = {
     createList,
     getLists,
     getListById,
     updateListById,
-    deleteListById
+    deleteListById,
+    reorderLists
 };
 
 export default listService;

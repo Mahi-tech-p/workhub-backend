@@ -79,12 +79,26 @@ const deleteList = asyncHandler(async (req, res) => {
     });
 
 });
+const reorderLists = asyncHandler(async (req, res) => {
+
+    await listService.reorderLists({
+        lists: req.body.lists,
+        userId: req.user.id,
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Lists reordered successfully",
+    });
+
+});
 const listController = {
     createList,
     getLists,
     getListById,
     updateList,
-    deleteList
+    deleteList,
+    reorderLists
 };
 
 export default listController;
