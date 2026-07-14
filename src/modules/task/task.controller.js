@@ -85,12 +85,26 @@ const deleteTask = asyncHandler(async (req, res) => {
     });
 
 });
+const reorderTasks = asyncHandler(async (req, res) => {
+
+    await taskService.reorderTasks({
+        tasks: req.body.tasks,
+        userId: req.user.id,
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Tasks reordered successfully",
+    });
+
+});
 const taskController = {
     createTask,
     getTasksByList,
     getTaskById,
     updateTask,
-    deleteTask
+    deleteTask,
+    reorderTasks
 };
 
 export default taskController;

@@ -8,6 +8,7 @@ import taskController from "./task.controller.js";
 import {
     createTaskSchema,
     listParamsSchema,
+    reorderTasksSchema,
     taskParamsSchema,
     updateTaskSchema,
 } from "./task.validation.js";
@@ -40,6 +41,14 @@ router.get(
     taskController.getTaskById
 );
 router.patch(
+    "/tasks/reorder",
+    authenticate,
+    validate({
+        body: reorderTasksSchema,
+    }),
+    taskController.reorderTasks
+);
+router.patch(
     "/tasks/:taskId",
     authenticate,
     validate({
@@ -56,4 +65,5 @@ router.delete(
     }),
     taskController.deleteTask
 );
+
 export default router;

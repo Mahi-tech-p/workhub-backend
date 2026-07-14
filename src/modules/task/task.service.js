@@ -373,12 +373,111 @@ const deleteTaskById = async ({
 
     return;
 };
+const reorderTasks = async ({
+    tasks,
+    userId,
+}) => {
+
+    const taskIds = tasks.map(task => task.id);
+
+    const existingTasks =
+        await taskRepository.findByIds(
+            db,
+            taskIds
+        );
+
+    if (existingTasks.length !== taskIds.length) {
+        throw new NotFoundError(
+            "One or more tasks not found",
+            "TASK_NOT_FOUND"
+        );
+    }
+
+    // Ensure all belong to same list
+    const listId = existingTasks[0].listId;
+
+    const sameList = existingTasks.every(
+        task => task.listId === listId
+    );
+
+    if (!sameList) {
+        throw new ConflictError(
+            "Tasks must belong to same list",
+            "INVALID_TASKS"
+        );
+    }
+
+    const list =
+        await listRepository.findById(
+            db,
+            listId
+        );
+
+    if (!list) {
+        throw new NotFoundError(
+            "List not found",
+            "LIST_NOT_FOUND"
+        );
+    }
+
+    const member =
+        await projectRepository.findProjectMemberByUserId(
+            db,
+            list.projectId,
+            userId
+        );
+
+    if (!member) {
+        throw new ForbiddenError(
+            "Project access denied",
+            "PROJECT_ACCESS_DENIED"
+        );
+    }
+
+    if (!["OWNER", "ADMIN"].includes(member.role)) {
+        throw new ForbiddenError(
+            "Insufficient permissions",
+            "INSUFFICIENT_PERMISSIONS"
+        );
+    }
+
+    // Duplicate positions
+    const positions =
+        tasks.map(task => task.position);
+
+    if (
+        new Set(positions).size !==
+        positions.length
+    ) {
+        throw new ConflictError(
+            "Duplicate positions are not allowed",
+            "INVALID_POSITIONS"
+        );
+    }
+
+    await db.transaction(async (tx) => {
+
+        for (const task of tasks) {
+
+            await taskRepository.updatePosition(
+                tx,
+                task.id,
+                task.position,
+                listId
+            );
+
+        }
+
+    });
+
+};
 const taskService = {
     createTask,
     getTasksByList,
     getTaskById,
     updateTaskById,
-    deleteTaskById
+    deleteTaskById,
+    reorderTasks
 };
 
 export default taskService;
