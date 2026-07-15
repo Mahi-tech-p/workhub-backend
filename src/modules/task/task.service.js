@@ -126,6 +126,7 @@ const createTask = async ({
                 createdBy: userId,
             }
         );
+
     await activityService.log({
         projectId: list.projectId,
         taskId: task.id,
@@ -323,7 +324,13 @@ const updateTaskById = async ({
     if (priority !== undefined) updateData.priority = priority;
     if (dueDate !== undefined) updateData.dueDate = dueDate;
     if (assigneeId !== undefined) updateData.assigneeId = assigneeId;
-
+    const oldTask = {
+        title: task.title,
+        description: task.description,
+        priority: task.priority,
+        dueDate: task.dueDate,
+        assigneeId: task.assigneeId,
+    };
     const updatedTask =
         await taskRepository.update(
             db,
@@ -399,22 +406,28 @@ const deleteTaskById = async ({
             "INSUFFICIENT_PERMISSIONS"
         );
     }
-
+    const deletedTask = {
+        title: task.title,
+        description: task.description,
+        priority: task.priority,
+        dueDate: task.dueDate,
+        assigneeId: task.assigneeId,
+    };
+    await activityService.log({
+        projectId: list.projectId,
+        taskId: task.id,
+        userId,
+        entityType: ENTITY_TYPES.TASK,
+        action: ACTIVITY_ACTIONS.DELETED,
+        entityId: task.id,
+        oldValue: deletedTask
+    });
     await taskRepository.remove(
         db,
         taskId
     );
-    await activityService.log({
-    projectId: list.projectId,
-    taskId: task.id,
-    userId,
-    entityType: ENTITY_TYPES.TASK,
-    action: ACTIVITY_ACTIONS.DELETED,
-    entityId: task.id,
-    oldValue: {
-        title: oldTask.title,
-    },
-});
+
+    
     return;
 };
 const reorderTasks = async ({
@@ -621,20 +634,21 @@ const moveTask = async ({
         );
 
     });
+
     await activityService.log({
-    projectId: sourceList.projectId,
-    taskId,
-    userId,
-    entityType: ENTITY_TYPES.TASK,
-    action: ACTIVITY_ACTIONS.MOVED,
-    entityId: taskId,
-    oldValue: {
-        list: sourceList.name,
-    },
-    newValue: {
-        list: destinationList.name,
-    },
-});
+        projectId: sourceList.projectId,
+        taskId,
+        userId,
+        entityType: ENTITY_TYPES.TASK,
+        action: ACTIVITY_ACTIONS.MOVED,
+        entityId: taskId,
+        oldValue: {
+            list: sourceList.name,
+        },
+        newValue: {
+            list: destinationList.name,
+        },
+    });
 
 };
 const taskService = {

@@ -56,7 +56,8 @@ const findByTaskId = async (database, taskId) => {
 
             user: {
                 id: users.id,
-                name: users.name,
+                firstName: users.firstName,
+                lastName: users.lastName,
                 email: users.email,
             },
         })

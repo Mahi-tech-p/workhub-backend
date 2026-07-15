@@ -6,6 +6,7 @@ import projectRoutes from "../modules/project/project.routes.js";
 import listRoutes from "../modules/list/list.routes.js";
 import taskRoutes from "../modules/task/task.routes.js"
 import commentRoutes from "../modules/comments/comment.routes.js"
+import activityRoutes from "../modules/activity/activity.routes.js";
 const router = Router();
 
 router.use("/auth", authRoutes)
@@ -15,4 +16,5 @@ router.use("/projects", projectRoutes);
 router.use("/", listRoutes);
 router.use("/", taskRoutes);
 router.use("/", commentRoutes);
+router.use("/", activityRoutes);
 export default router;

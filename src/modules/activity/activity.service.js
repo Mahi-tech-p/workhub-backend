@@ -9,6 +9,7 @@ import {
     NotFoundError,
     ForbiddenError,
 } from "../../errors/index.js";
+import { authorizeProjectAccess } from "../../authorization/project.authorization.js";
 
 const log = async ({
     projectId,
@@ -32,58 +33,81 @@ const log = async ({
     });
 };
 
+// const getTaskActivity = async ({
+//     taskId,
+//     userId,
+// }) => {
+
+//     // Check task exists
+//     const task = await taskRepository.findById(
+//         db,
+//         taskId
+//     );
+
+//     if (!task) {
+//         throw new NotFoundError(
+//             "Task not found",
+//             "TASK_NOT_FOUND"
+//         );
+//     }
+
+//     // Check list exists
+//     const list = await listRepository.findById(
+//         db,
+//         task.listId
+//     );
+
+//     if (!list) {
+//         throw new NotFoundError(
+//             "List not found",
+//             "LIST_NOT_FOUND"
+//         );
+//     }
+
+//     // Verify project membership
+//     const member =
+//         await projectRepository.findProjectMemberByUserId(
+//             db,
+//             list.projectId,
+//             userId
+//         );
+
+//     if (!member) {
+//         throw new ForbiddenError(
+//             "You do not have access to this task",
+//             "TASK_ACCESS_DENIED"
+//         );
+//     }
+
+//     return await activityRepository.findByTaskId(
+//         db,
+//         taskId
+//     );
+// };
 const getTaskActivity = async ({
     taskId,
     userId,
 }) => {
 
-    // Check task exists
-    const task = await taskRepository.findById(
+    const activities = await activityRepository.findByTaskId(
         db,
         taskId
     );
 
-    if (!task) {
+    if (activities.length === 0) {
         throw new NotFoundError(
-            "Task not found",
-            "TASK_NOT_FOUND"
+            "No activity found",
+            "ACTIVITY_NOT_FOUND"
         );
     }
 
-    // Check list exists
-    const list = await listRepository.findById(
-        db,
-        task.listId
+    await authorizeProjectAccess(
+        activities[0].projectId,
+        userId
     );
 
-    if (!list) {
-        throw new NotFoundError(
-            "List not found",
-            "LIST_NOT_FOUND"
-        );
-    }
-
-    // Verify project membership
-    const member =
-        await projectRepository.findProjectMemberByUserId(
-            db,
-            list.projectId,
-            userId
-        );
-
-    if (!member) {
-        throw new ForbiddenError(
-            "You do not have access to this task",
-            "TASK_ACCESS_DENIED"
-        );
-    }
-
-    return await activityRepository.findByTaskId(
-        db,
-        taskId
-    );
+    return activities;
 };
-
 const activityService = {
     log,
     getTaskActivity,
