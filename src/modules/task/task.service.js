@@ -427,7 +427,7 @@ const deleteTaskById = async ({
         taskId
     );
 
-    
+
     return;
 };
 const reorderTasks = async ({
@@ -634,22 +634,24 @@ const moveTask = async ({
         );
 
     });
-
-    await activityService.log({
-        projectId: sourceList.projectId,
-        taskId,
-        userId,
-        entityType: ENTITY_TYPES.TASK,
-        action: ACTIVITY_ACTIONS.MOVED,
-        entityId: taskId,
-        oldValue: {
-            list: sourceList.name,
-        },
-        newValue: {
-            list: destinationList.name,
-        },
-    });
-
+    if (sourceList.id !== destinationList.id) {
+        await activityService.log({
+            projectId: sourceList.projectId,
+            taskId: task.id,
+            userId,
+            entityType: ENTITY_TYPES.TASK,
+            action: ACTIVITY_ACTIONS.MOVED,
+            entityId: task.id,
+            oldValue: {
+                listId: sourceList.id,
+                listName: sourceList.name,
+            },
+            newValue: {
+                listId: destinationList.id,
+                listName: destinationList.name,
+            },
+        });
+    }
 };
 const taskService = {
     createTask,

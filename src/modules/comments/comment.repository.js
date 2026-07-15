@@ -23,7 +23,8 @@ const findById = async (database, commentId) => {
 
             author: {
                 id: users.id,
-                name: users.name,
+                firstName: users.firstName,
+                lastName:users.lastName,
                 email: users.email,
             },
         })

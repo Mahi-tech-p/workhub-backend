@@ -13,7 +13,7 @@ import {
 } from "./comment.validation.js";
 
 const router = Router();
-
+console.log("inside comment routes")
 // Create Comment
 router.post(
     "/tasks/:taskId/comments",

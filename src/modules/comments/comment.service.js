@@ -8,6 +8,8 @@ import {
     NotFoundError,
     ForbiddenError,
 } from "../../errors/index.js";
+import activityService from "../activity/activity.service.js";
+import { ACTIVITY_ACTIONS, ENTITY_TYPES } from "../../constants/activity.constants.js";
 
 const createComment = async ({
     taskId,
@@ -65,6 +67,7 @@ const createComment = async ({
                 content,
             }
         );
+    
     await activityService.log({
     projectId: list.projectId,
     taskId,
