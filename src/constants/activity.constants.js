@@ -1,0 +1,15 @@
+export const ACTIVITY_ACTIONS = {
+    CREATED: "CREATED",
+    UPDATED: "UPDATED",
+    DELETED: "DELETED",
+    MOVED: "MOVED",
+    COMMENTED: "COMMENTED",
+    ASSIGNED: "ASSIGNED",
+};
+
+export const ENTITY_TYPES = {
+    PROJECT: "PROJECT",
+    LIST: "LIST",
+    TASK: "TASK",
+    COMMENT: "COMMENT",
+};
