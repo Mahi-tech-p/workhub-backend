@@ -40,12 +40,7 @@ export const activityLogs = pgTable(
                 onDelete: "cascade",
             }),
 
-        taskId: uuid("task_id").references(
-            () => tasks.id,
-            {
-                onDelete: "cascade",
-            }
-        ),
+        taskId: uuid("task_id"),
 
         userId: uuid("user_id")
             .notNull()
