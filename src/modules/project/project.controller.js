@@ -51,10 +51,62 @@ const getProjectById = asyncHandler(async (req, res) => {
     });
 
 });
+const addProjectMember = asyncHandler(async (req, res) => {
+
+    const { projectId } = req.params;
+    const { userId, role } = req.body;
+
+    const member = await projectService.addProjectMember({
+        projectId,
+        userId,
+        role,
+        currentUserId: req.user.id,
+    });
+
+    return res.status(201).json({
+        success: true,
+        message: "Project member added successfully",
+        data: member,
+    });
+});
+const getProjectMembers = asyncHandler(async (req, res) => {
+
+    const { projectId } = req.params;
+
+    const members =
+        await projectService.getProjectMembers({
+            projectId,
+            userId: req.user.id,
+        });
+
+    return res.status(200).json({
+        success: true,
+        message: "Project members fetched successfully",
+        data: members,
+    });
+});
+const removeProjectMember = asyncHandler(async (req, res) => {
+
+    const { projectId, memberId } = req.params;
+
+    await projectService.removeProjectMember({
+        projectId,
+        memberId,
+        userId: req.user.id,
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Project member removed successfully",
+    });
+});
 const projectController = {
     createProject,
     getProjects,
-    getProjectById
+    getProjectById,
+    addProjectMember,
+    getProjectMembers,
+    removeProjectMember,
 };
 
 export default projectController;

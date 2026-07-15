@@ -3,7 +3,7 @@ import { and, desc, eq } from 'drizzle-orm';
 import { projects } from '../../db/schema/projects.js';
 import { organizationMembers } from '../../db/schema/organizationMembers.js';
 import { projectMembers } from "../../db/schema/projectMembers.js"
-
+import { users } from '../../db/schema/users.js';
 const createProject = async (database, data) => {
     const result = await database
         .insert(projects)
@@ -12,7 +12,7 @@ const createProject = async (database, data) => {
     return result[0] ?? null;
 }
 
-const addMemberToProject = async (database, data) => {
+const createProjectMember = async (database, data) => {
     const result = await database
         .insert(projectMembers)
         .values(data)
@@ -106,13 +106,65 @@ const findProjectMemberByUserId = async (
 
     return result[0] ?? null;
 };
+const findProjectMemberById = async (
+    database,
+    memberId
+) => {
 
+    const result = await database
+        .select()
+        .from(projectMembers)
+        .where(eq(projectMembers.id, memberId));
+
+    return result[0] ?? null;
+};
+const findMembersByProjectId = async (
+    database,
+    projectId
+) => {
+
+    return await database
+        .select({
+            id: projectMembers.id,
+            role: projectMembers.role,
+            joinedAt: projectMembers.joinedAt,
+
+            user: {
+                id: users.id,
+                firstName: users.firstName,
+                lastName: users.lastName,
+                email: users.email,
+            },
+        })
+        .from(projectMembers)
+        .innerJoin(
+            users,
+            eq(projectMembers.userId, users.id)
+        )
+        .where(eq(projectMembers.projectId, projectId))
+        .orderBy(users.firstName);
+};
+const removeProjectMember = async (
+    database,
+    memberId
+) => {
+
+    const result = await database
+        .delete(projectMembers)
+        .where(eq(projectMembers.id, memberId))
+        .returning();
+
+    return result[0] ?? null;
+};
 export const projectRepository = {
     createProject,
-    addMemberToProject,
+    createProjectMember,
     findBySlug,
     findById,
     findByOrganizationId,
     findMemberByUserId,
-    findProjectMemberByUserId
+    findProjectMemberByUserId,
+    findProjectMemberById,
+    findMembersByProjectId,
+    removeProjectMember
 };
