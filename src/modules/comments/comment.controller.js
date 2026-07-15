@@ -7,6 +7,7 @@ const createComment = asyncHandler(async (req, res) => {
     const comment = await commentService.createComment({
         taskId,
         content: req.body.content,
+        actorName: req.user.firstName,
         userId: req.user.id,
     });
 

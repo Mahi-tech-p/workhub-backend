@@ -12,6 +12,7 @@ import {
     ENTITY_TYPES,
     ACTIVITY_ACTIONS,
 } from "../../constants/activity.constants.js";
+import { NOTIFICATION_TITLES, NOTIFICATION_TYPES } from "../../constants/notification.constants.js";
 
 const createTask = async ({
     listId,
@@ -653,6 +654,112 @@ const moveTask = async ({
         });
     }
 };
+const assignTask = async ({
+    taskId,
+    assigneeId,
+    userId,
+}) => {
+
+    // Find task
+    const task = await taskRepository.findById(
+        db,
+        taskId
+    );
+
+    if (!task) {
+        throw new NotFoundError(
+            "Task not found",
+            "TASK_NOT_FOUND"
+        );
+    }
+
+    // Find list
+    const list = await listRepository.findById(
+        db,
+        task.listId
+    );
+
+    if (!list) {
+        throw new NotFoundError(
+            "List not found",
+            "LIST_NOT_FOUND"
+        );
+    }
+
+    // Verify current user is a project member
+    const member =
+        await projectRepository.findProjectMemberByUserId(
+            db,
+            list.projectId,
+            userId
+        );
+
+    if (!member) {
+        throw new ForbiddenError(
+            "Project access denied",
+            "PROJECT_ACCESS_DENIED"
+        );
+    }
+
+    // Only OWNER & ADMIN can assign tasks
+    if (!["OWNER", "ADMIN"].includes(member.role)) {
+        throw new ForbiddenError(
+            "Insufficient permissions",
+            "INSUFFICIENT_PERMISSIONS"
+        );
+    }
+
+    // Verify assignee is a project member
+    const assignee =
+        await projectRepository.findProjectMemberByUserId(
+            db,
+            list.projectId,
+            assigneeId
+        );
+
+    if (!assignee) {
+        throw new ConflictError(
+            "Assignee is not a project member",
+            "INVALID_ASSIGNEE"
+        );
+    }
+
+    // Update assignee
+    const updatedTask =
+        await taskRepository.assignTask(
+            db,
+            taskId,
+            assigneeId
+        );
+
+    // Log activity
+    await activityService.log({
+        projectId: list.projectId,
+        taskId: task.id,
+        userId,
+        entityType: ENTITY_TYPES.TASK,
+        action: ACTIVITY_ACTIONS.ASSIGNED,
+        entityId: task.id,
+        oldValue: {
+            assigneeId: task.assigneeId,
+        },
+        newValue: {
+            assigneeId,
+        },
+    });
+
+    // Create notification
+    await notificationService.createNotification({
+        userId: assigneeId,
+        type: NOTIFICATION_TYPES.TASK_ASSIGNED,
+        title: NOTIFICATION_TITLES.TASK_ASSIGNED,
+        message: `You have been assigned "${task.title}"`,
+        entityType: "TASK",
+        entityId: task.id,
+    });
+
+    return updatedTask;
+};
 const taskService = {
     createTask,
     getTasksByList,
@@ -660,7 +767,8 @@ const taskService = {
     updateTaskById,
     deleteTaskById,
     reorderTasks,
-    moveTask
+    moveTask,
+    assignTask
 };
 
 export default taskService;

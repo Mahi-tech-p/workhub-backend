@@ -142,6 +142,22 @@ const decrementPositionsAfter = async (
             )
         );
 };
+const assignTask = async (
+    database,
+    taskId,
+    assigneeId
+) => {
+
+    const result = await database
+        .update(tasks)
+        .set({
+            assigneeId,
+        })
+        .where(eq(tasks.id, taskId))
+        .returning();
+
+    return result[0] ?? null;
+};
 export const taskRepository = {
     create,
     findById,
@@ -153,5 +169,6 @@ export const taskRepository = {
     remove,
     findByTitle,
     incrementPositionsFrom,
-    decrementPositionsAfter
+    decrementPositionsAfter,
+    assignTask
 };

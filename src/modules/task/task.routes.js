@@ -6,6 +6,7 @@ import validate from "../../middleware/validate.middleware.js";
 import taskController from "./task.controller.js";
 
 import {
+    assignTaskSchema,
     createTaskSchema,
     listParamsSchema,
     moveTaskSchema,
@@ -74,6 +75,15 @@ router.delete(
         params: taskParamsSchema,
     }),
     taskController.deleteTask
+);
+router.patch(
+    "/tasks/:taskId/assign",
+    authenticate,
+    validate({
+        params: taskParamsSchema,
+        body: assignTaskSchema,
+    }),
+    taskController.assignTask
 );
 
 export default router;

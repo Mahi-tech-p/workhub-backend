@@ -114,6 +114,25 @@ const moveTask = asyncHandler(async (req, res) => {
     });
 
 });
+const assignTask = asyncHandler(async (req, res) => {
+
+    const { taskId } = req.params;
+
+    const { assigneeId } = req.body;
+
+    const task = await taskService.assignTask({
+        taskId,
+        assigneeId,
+        userId: req.user.id,
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Task assigned successfully",
+        data: task,
+    });
+
+});
 const taskController = {
     createTask,
     getTasksByList,
@@ -121,7 +140,8 @@ const taskController = {
     updateTask,
     deleteTask,
     reorderTasks,
-    moveTask
+    moveTask,
+    assignTask
 };
 
 export default taskController;

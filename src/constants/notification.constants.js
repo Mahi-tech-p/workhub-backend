@@ -1,0 +1,15 @@
+export const NOTIFICATION_TYPES = {
+    TASK_ASSIGNED: "TASK_ASSIGNED",
+    COMMENT_ADDED: "COMMENT_ADDED",
+    PROJECT_INVITATION: "PROJECT_INVITATION",
+    TASK_COMPLETED: "TASK_COMPLETED",
+    TASK_DUE: "TASK_DUE",
+};
+
+export const NOTIFICATION_TITLES = {
+    TASK_ASSIGNED: "Task Assigned",
+    COMMENT_ADDED: "New Comment",
+    PROJECT_INVITATION: "Project Invitation",
+    TASK_COMPLETED: "Task Completed",
+    TASK_DUE: "Task Due",
+};

@@ -67,18 +67,29 @@ const createComment = async ({
                 content,
             }
         );
-    
+    if (task.assigneeId &&
+        task.assigneeId !== userId) {
+        await notificationService.createNotification({
+            userId: task.assigneeId,
+            type: NOTIFICATION_TYPES.COMMENT_ADDED,
+            title: "New Comment",
+            message: `${req.user.firstName} commented on "${task.title}"`,
+            entityType: "TASK",
+            entityId: task.id,
+        });
+    }
     await activityService.log({
-    projectId: list.projectId,
-    taskId,
-    userId,
-    entityType: ENTITY_TYPES.COMMENT,
-    action: ACTIVITY_ACTIONS.COMMENTED,
-    entityId: comment.id,
-    newValue: {
-        content: comment.content,
-    },
-});
+        projectId: list.projectId,
+        taskId,
+        userId,
+        entityType: ENTITY_TYPES.COMMENT,
+        action: ACTIVITY_ACTIONS.COMMENTED,
+        entityId: comment.id,
+        newValue: {
+            content: comment.content,
+        },
+
+    });
     // Return comment with author details
     return await commentRepository.findById(
         db,

@@ -87,3 +87,6 @@ export const moveTaskSchema = z.object({
         .int()
         .positive(),
 });
+export const assignTaskSchema = z.object({
+    assigneeId: z.uuid("Invalid assignee id"),
+});
