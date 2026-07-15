@@ -4,10 +4,14 @@ import { taskRepository } from "./task.repository.js";
 import { listRepository } from "../list/list.repository.js";
 import { projectRepository } from "../project/project.repository.js";
 import { authRepository } from "../auth/auth.repository.js";
-
+import activityService from "../activity/activity.service.js";
 import ConflictError from "../../errors/ConflictError.js";
 import ForbiddenError from "../../errors/ForbiddenError.js";
 import NotFoundError from "../../errors/NotFoundError.js";
+import {
+    ENTITY_TYPES,
+    ACTIVITY_ACTIONS,
+} from "../../constants/activity.constants.js";
 
 const createTask = async ({
     listId,
@@ -122,6 +126,19 @@ const createTask = async ({
                 createdBy: userId,
             }
         );
+    await activityService.log({
+        projectId: list.projectId,
+        taskId: task.id,
+        userId,
+        entityType: ENTITY_TYPES.TASK,
+        action: ACTIVITY_ACTIONS.CREATED,
+        entityId: task.id,
+        newValue: {
+            title: task.title,
+            priority: task.priority,
+            list: list.name,
+        },
+    });
 
     return task;
 
@@ -301,11 +318,11 @@ const updateTaskById = async ({
     }
     const updateData = {};
 
-if (title !== undefined) updateData.title = title;
-if (description !== undefined) updateData.description = description;
-if (priority !== undefined) updateData.priority = priority;
-if (dueDate !== undefined) updateData.dueDate = dueDate;
-if (assigneeId !== undefined) updateData.assigneeId = assigneeId;
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (priority !== undefined) updateData.priority = priority;
+    if (dueDate !== undefined) updateData.dueDate = dueDate;
+    if (assigneeId !== undefined) updateData.assigneeId = assigneeId;
 
     const updatedTask =
         await taskRepository.update(
@@ -313,7 +330,24 @@ if (assigneeId !== undefined) updateData.assigneeId = assigneeId;
             taskId,
             updateData
         );
-
+    await activityService.log({
+        projectId: list.projectId,
+        taskId: task.id,
+        userId,
+        entityType: ENTITY_TYPES.TASK,
+        action: ACTIVITY_ACTIONS.UPDATED,
+        entityId: task.id,
+        oldValue: {
+            title: oldTask.title,
+            priority: oldTask.priority,
+            dueDate: oldTask.dueDate,
+        },
+        newValue: {
+            title: updatedTask.title,
+            priority: updatedTask.priority,
+            dueDate: updatedTask.dueDate,
+        },
+    });
     return updatedTask;
 };
 const deleteTaskById = async ({
@@ -370,7 +404,17 @@ const deleteTaskById = async ({
         db,
         taskId
     );
-
+    await activityService.log({
+    projectId: list.projectId,
+    taskId: task.id,
+    userId,
+    entityType: ENTITY_TYPES.TASK,
+    action: ACTIVITY_ACTIONS.DELETED,
+    entityId: task.id,
+    oldValue: {
+        title: oldTask.title,
+    },
+});
     return;
 };
 const reorderTasks = async ({
@@ -577,6 +621,20 @@ const moveTask = async ({
         );
 
     });
+    await activityService.log({
+    projectId: sourceList.projectId,
+    taskId,
+    userId,
+    entityType: ENTITY_TYPES.TASK,
+    action: ACTIVITY_ACTIONS.MOVED,
+    entityId: taskId,
+    oldValue: {
+        list: sourceList.name,
+    },
+    newValue: {
+        list: destinationList.name,
+    },
+});
 
 };
 const taskService = {

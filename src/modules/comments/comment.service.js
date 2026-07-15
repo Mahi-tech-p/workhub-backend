@@ -65,7 +65,17 @@ const createComment = async ({
                 content,
             }
         );
-
+    await activityService.log({
+    projectId: list.projectId,
+    taskId,
+    userId,
+    entityType: ENTITY_TYPES.COMMENT,
+    action: ACTIVITY_ACTIONS.COMMENTED,
+    entityId: comment.id,
+    newValue: {
+        content: comment.content,
+    },
+});
     // Return comment with author details
     return await commentRepository.findById(
         db,
