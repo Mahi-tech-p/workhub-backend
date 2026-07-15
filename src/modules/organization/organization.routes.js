@@ -1,7 +1,7 @@
 import { Router } from "express"
 import authenticate from "../../middleware/authenticate.middleware.js"
 import validate from "../../middleware/validate.middleware.js"
-import { createOrganizationSchema } from "./organization.validation.js"
+import { addOrganizationMemberSchema, createOrganizationSchema, organizationMemberParamsSchema } from "./organization.validation.js"
 import organizationController from "./organization.controller.js"
 import projectController from "../project/project.controller.js"
 import { createProjectSchema, organizationParamsSchema } from "../project/project.validation.js"
@@ -17,4 +17,29 @@ router.post("/:organizationId/projects",authenticate,validate({params: organizat
 router.get("/:organizationId/projects",authenticate,validate({params: organizationParamsSchema,}),
     projectController.getProjects
 )
+router.post(
+    "/:organizationId/members",
+    authenticate,
+    validate({
+        params: organizationParamsSchema,
+        body: addOrganizationMemberSchema,
+    }),
+    organizationController.addOrganizationMember
+);
+router.get(
+    "/:organizationId/members",
+    authenticate,
+    validate({
+        params: organizationParamsSchema,
+    }),
+    organizationController.getOrganizationMembers
+);
+router.delete(
+    "/:organizationId/members/:memberId",
+    authenticate,
+    validate({
+        params: organizationMemberParamsSchema,
+    }),
+    organizationController.removeOrganizationMember
+);
 export default router

@@ -24,8 +24,61 @@ const getOrganizations = asyncHandler(async (req, res) => {
         data: result
     })
 })
+const addOrganizationMember = asyncHandler(async (req, res) => {
+    const { organizationId } = req.params;
+    const { userId, role } = req.body;
+
+    const member =
+        await organisationService.addOrganizationMember({
+            organizationId,
+            userId,
+            role,
+            currentUserId: req.user.id,
+        });
+
+    return res.status(201).json({
+        success: true,
+        message: "Organization member added successfully",
+        data: member,
+    });
+});
+const getOrganizationMembers = asyncHandler(async (req, res) => {
+
+    const { organizationId } = req.params;
+
+    const members =
+        await organizationService.getOrganizationMembers({
+            organizationId,
+            userId: req.user.id,
+        });
+
+    return res.status(200).json({
+        success: true,
+        message: "Organization members fetched successfully",
+        data: members,
+    });
+});
+const removeOrganizationMember = asyncHandler(async (req, res) => {
+
+    const { organizationId, memberId } = req.params;
+
+    await organizationService.removeOrganizationMember({
+        organizationId,
+        memberId,
+        userId: req.user.id,
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Organization member removed successfully",
+    });
+});
 const organizationController = {
     createOrganization,
-    getOrganizations
+    getOrganizations,
+    addOrganizationMember,
+    getOrganizationMembers,
+    removeOrganizationMember
+
 }
 export default organizationController

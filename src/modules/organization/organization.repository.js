@@ -2,6 +2,7 @@ import { desc, eq ,and} from "drizzle-orm";
 import { organizationMembers } from "../../db/schema/organizationMembers.js";
 import { organizations } from "../../db/schema/organizations.js";
 import { db } from "../../db/index.js";
+import { users } from "../../db/schema/users.js";
 const createOrganization = async (database, data) => {
 
     const result = await database
@@ -74,10 +75,98 @@ const findMemberByUserId = async (
 
     return result[0] ?? null;
 };
+const findById = async (
+    database,
+    organizationId
+) => {
+
+    const result = await database
+        .select()
+        .from(organizations)
+        .where(
+            eq(
+                organizations.id,
+                organizationId
+            )
+        );
+
+    return result[0] ?? null;
+};
+const findOrganizationMemberById = async (
+    database,
+    memberId
+) => {
+
+    const result = await database
+        .select()
+        .from(organizationMembers)
+        .where(
+            eq(
+                organizationMembers.id,
+                memberId
+            )
+        );
+
+    return result[0] ?? null;
+};
+const findOrganizationMembers = async (
+    database,
+    organizationId
+) => {
+
+    return await database
+        .select({
+            id: organizationMembers.id,
+            role: organizationMembers.role,
+            joinedAt: organizationMembers.joinedAt,
+
+            user: {
+                id: users.id,
+                firstName: users.firstName,
+                lastName: users.lastName,
+                email: users.email,
+            },
+        })
+        .from(organizationMembers)
+        .innerJoin(
+            users,
+            eq(
+                organizationMembers.userId,
+                users.id
+            )
+        )
+        .where(
+            eq(
+                organizationMembers.organizationId,
+                organizationId
+            )
+        )
+        .orderBy(users.firstName);
+};
+const removeOrganizationMember = async (
+    database,
+    memberId
+) => {
+
+    const result = await database
+        .delete(organizationMembers)
+        .where(
+            eq(
+                organizationMembers.id,
+                memberId
+            )
+        )
+        .returning();
+
+    return result[0] ?? null;
+};
 export const organizationRepository = {
     createOrganization,
     addMemberToOrganization,
     findBySlug,
     findByUserId,
-    findMemberByUserId
+    findMemberByUserId,
+    findById,
+    findOrganizationMemberById,
+    findOrganizationMembers
 }
