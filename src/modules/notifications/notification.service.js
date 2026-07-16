@@ -7,7 +7,7 @@ import {
     ForbiddenError,
 } from "../../errors/index.js";
 
-const createNotification = async ({
+const createNotification = async (database , {
     userId,
     type,
     title,
@@ -16,7 +16,7 @@ const createNotification = async ({
     entityId = null,
 }) => {
 
-    return await notificationRepository.create(db, {
+    return await notificationRepository.create(database, {
         userId,
         type,
         title,

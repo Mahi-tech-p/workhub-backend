@@ -108,43 +108,55 @@ const createTask = async ({
 
     }
 
-    const maxPosition =
-        await taskRepository.getMaxPosition(
-            db,
-            listId
-        );
 
-    const task =
-        await taskRepository.create(
-            db,
-            {
-                listId,
-                title,
-                description,
-                priority,
-                dueDate,
-                assigneeId,
-                position: maxPosition + 1,
-                createdBy: userId,
-            }
-        );
+    const taskCreated = await db.transaction(async (tx) => {
+        const maxPosition =
+            await taskRepository.getMaxPosition(
+                db,
+                listId
+            );
+        const task =
+            await taskRepository.create(
+                tx,
+                {
+                    listId,
+                    title,
+                    description,
+                    priority,
+                    dueDate,
+                    assigneeId,
+                    position: maxPosition + 1,
+                    createdBy: userId,
+                }
+            );
 
-    await activityService.log({
-        projectId: list.projectId,
-        taskId: task.id,
-        userId,
-        entityType: ENTITY_TYPES.TASK,
-        action: ACTIVITY_ACTIONS.CREATED,
-        entityId: task.id,
-        newValue: {
-            title: task.title,
-            priority: task.priority,
-            list: list.name,
-        },
-    });
+        await activityService.log(tx, {
+            projectId: list.projectId,
+            taskId: task.id,
+            userId,
+            entityType: ENTITY_TYPES.TASK,
+            action: ACTIVITY_ACTIONS.CREATED,
+            entityId: task.id,
+            newValue: {
+                title: task.title,
+                priority: task.priority,
+                list: list.name,
+            },
+        });
 
-    return task;
-
+        if (assigneeId) {
+            await notificationService.createNotification(tx, {
+                userId: assigneeId,
+                type: NOTIFICATION_TYPES.TASK_ASSIGNED,
+                title: NOTIFICATION_TITLES.TASK_ASSIGNED,
+                message: `You have been assigned "${task.title}"`,
+                entityType: ENTITY_TYPES.TASK,
+                entityId: task.id,
+            });
+        }
+        return task;
+    })
+    return taskCreated
 };
 const getTasksByList = async ({
     listId,
@@ -724,42 +736,44 @@ const assignTask = async ({
             "INVALID_ASSIGNEE"
         );
     }
+    const previousAssigneeId = task.assigneeId;
+    const updatedTask = await db.transaction(async (tx) => {
+        // Update assignee
+        const task =
+            await taskRepository.assignTask(
+                tx,
+                taskId,
+                assigneeId
+            );
 
-    // Update assignee
-    const updatedTask =
-        await taskRepository.assignTask(
-            db,
-            taskId,
-            assigneeId
-        );
+        // Log activity
+        await activityService.log(tx, {
+            projectId: list.projectId,
+            taskId: task.id,
+            userId,
+            entityType: ENTITY_TYPES.TASK,
+            action: ACTIVITY_ACTIONS.ASSIGNED,
+            entityId: task.id,
+            oldValue: {
+                assigneeId: previousAssigneeId,
+            },
+            newValue: {
+                assigneeId,
+            },
+        });
 
-    // Log activity
-    await activityService.log({
-        projectId: list.projectId,
-        taskId: task.id,
-        userId,
-        entityType: ENTITY_TYPES.TASK,
-        action: ACTIVITY_ACTIONS.ASSIGNED,
-        entityId: task.id,
-        oldValue: {
-            assigneeId: task.assigneeId,
-        },
-        newValue: {
-            assigneeId,
-        },
-    });
+        // Create notification
+        await notificationService.createNotification(tx, {
+            userId: assigneeId,
+            type: NOTIFICATION_TYPES.TASK_ASSIGNED,
+            title: NOTIFICATION_TITLES.TASK_ASSIGNED,
+            message: `You have been assigned "${task.title}"`,
+            entityType: "TASK",
+            entityId: task.id,
+        });
 
-    // Create notification
-    await notificationService.createNotification({
-        userId: assigneeId,
-        type: NOTIFICATION_TYPES.TASK_ASSIGNED,
-        title: NOTIFICATION_TITLES.TASK_ASSIGNED,
-        message: `You have been assigned "${task.title}"`,
-        entityType: "TASK",
-        entityId: task.id,
-    });
-
-    return updatedTask;
+        return task;
+    })
 };
 const taskService = {
     createTask,

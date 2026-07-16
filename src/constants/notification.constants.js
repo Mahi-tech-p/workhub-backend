@@ -5,6 +5,7 @@ export const NOTIFICATION_TYPES = {
     ORGANIZATION_INVITATION: "ORGANIZATION_INVITATION",
     TASK_COMPLETED: "TASK_COMPLETED",
     TASK_DUE: "TASK_DUE",
+    TASK_CREATED: "TASK_CREATED"
 };
 
 export const NOTIFICATION_TITLES = {
@@ -13,4 +14,5 @@ export const NOTIFICATION_TITLES = {
     PROJECT_INVITATION: "Project Invitation",
     TASK_COMPLETED: "Task Completed",
     TASK_DUE: "Task Due",
+    TASK_CREATED : "Task created"
 };

@@ -11,7 +11,7 @@ import {
 } from "../../errors/index.js";
 import { authorizeProjectAccess } from "../../authorization/project.authorization.js";
 
-const log = async ({
+const log = async (database,{
     projectId,
     taskId = null,
     userId,
@@ -21,7 +21,7 @@ const log = async ({
     oldValue = null,
     newValue = null,
 }) => {
-    return await activityRepository.create(db, {
+    return await activityRepository.create(database, {
         projectId,
         taskId,
         userId,
