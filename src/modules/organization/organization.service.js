@@ -4,6 +4,7 @@ import { organizationRepository } from "./organization.repository.js";
 import { db } from "../../db/index.js";
 import ConflictError from "../../errors/ConflictError.js";
 import { NOTIFICATION_TYPES } from "../../constants/notification.constants.js";
+import notificationService from "../notifications/notification.service.js";
 
 const createOrganization = async ({ name, userId }) => {
     const slug = slugify(name, {

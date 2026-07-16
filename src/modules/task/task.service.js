@@ -13,6 +13,7 @@ import {
     ACTIVITY_ACTIONS,
 } from "../../constants/activity.constants.js";
 import { NOTIFICATION_TITLES, NOTIFICATION_TYPES } from "../../constants/notification.constants.js";
+import notificationService from "../notifications/notification.service.js";
 
 const createTask = async ({
     listId,

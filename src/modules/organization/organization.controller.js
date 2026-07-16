@@ -47,7 +47,7 @@ const getOrganizationMembers = asyncHandler(async (req, res) => {
     const { organizationId } = req.params;
 
     const members =
-        await organizationService.getOrganizationMembers({
+        await organisationService.getOrganizationMembers({
             organizationId,
             userId: req.user.id,
         });

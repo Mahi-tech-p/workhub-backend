@@ -7,6 +7,7 @@ import { projectRepository } from "./project.repository.js";
 import ConflictError from "../../errors/ConflictError.js";
 import ForbiddenError from "../../errors/ForbiddenError.js";
 import NotFoundError from "../../errors/NotFoundError.js";
+import notificationService from "../notifications/notification.service.js";
 
 const createProject = async ({
     organizationId,
@@ -214,7 +215,7 @@ const addProjectMember = async ({
     }
 
     const member =
-        await projectRepository.addMemberToProject(
+        await projectRepository.createProjectMember(
             db,
             {
                 projectId,
