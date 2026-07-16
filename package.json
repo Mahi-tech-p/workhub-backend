@@ -22,6 +22,8 @@
   "homepage": "https://github.com/Mahi-tech-p/workhub-backend#readme",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1088.0",
+    "@aws-sdk/s3-request-presigner": "^3.1088.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.79.3",
     "cookie-parser": "^1.4.7",
@@ -33,6 +35,7 @@
     "ioredis": "^5.11.1",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.11.0",
+    "multer": "^2.2.0",
     "postgres": "^3.4.9",
     "slugify": "^1.6.9",
     "socket.io": "^4.8.3",
