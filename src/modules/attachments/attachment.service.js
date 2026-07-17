@@ -6,17 +6,18 @@ import { listRepository } from "../list/list.repository.js";
 import { projectRepository } from "../project/project.repository.js";
 
 import activityService from "../activity/activity.service.js";
-import { s3Service } from "../../services/storage/s3.service.js";
+import { s3Service } from "../../storage/s3.service.js";
 
 import {
     NotFoundError,
     ForbiddenError,
 } from "../../errors/index.js";
 
-import {
-    ENTITY_TYPES,
-    ACTIVITY_ACTIONS,
-} from "../activity/activity.constants.js";
+// import {
+//     ENTITY_TYPES,
+//     ACTIVITY_ACTIONS,
+// } from "../activity/activity.constants.js";
+import { ENTITY_TYPES, ACTIVITY_ACTIONS } from "../../constants/activity.constants.js";
 
 const uploadAttachment = async ({
     taskId,

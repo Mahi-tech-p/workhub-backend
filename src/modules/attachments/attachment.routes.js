@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import attachmentController from "./attachment.controller.js";
 
-import { authenticate } from "../../middleware/auth.middleware.js";
+import authenticate from "../../middleware/authenticate.middleware.js";
 import validate from "../../middleware/validate.middleware.js";
 import { upload } from "../../middleware/upload.middleware.js";
 

@@ -1,4 +1,4 @@
-import asyncHandler from "../../utils/asyncHandler.js";
+import {asyncHandler} from "../../utils/asyncHandler.js";
 
 import attachmentService from "./attachment.service.js";
 const uploadAttachment = asyncHandler(

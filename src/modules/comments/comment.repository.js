@@ -24,7 +24,7 @@ const findById = async (database, commentId) => {
             author: {
                 id: users.id,
                 firstName: users.firstName,
-                lastName:users.lastName,
+                lastName: users.lastName,
                 email: users.email,
             },
         })
@@ -49,9 +49,10 @@ const findByTaskId = async (database, taskId) => {
 
             author: {
                 id: users.id,
-                name: users.name,
+                firstName: users.firstName,
+                lastName: users.lastName,
                 // email: users.email,
-                avatar: users.avatarUrl,
+                // avatar: users.avatarUrl,
             },
         })
         .from(comments)

@@ -8,6 +8,9 @@ import ConflictError from "../../errors/ConflictError.js";
 import ForbiddenError from "../../errors/ForbiddenError.js";
 import NotFoundError from "../../errors/NotFoundError.js";
 import notificationService from "../notifications/notification.service.js";
+import { ACTIVITY_ACTIONS, ENTITY_TYPES } from "../../constants/activity.constants.js";
+import { NOTIFICATION_TITLES, NOTIFICATION_TYPES } from "../../constants/notification.constants.js";
+import activityService from "../activity/activity.service.js";
 
 const createProject = async ({
     organizationId,
@@ -183,7 +186,7 @@ const addProjectMember = async ({
             "INSUFFICIENT_PERMISSIONS"
         );
     }
-    
+
     // User must belong to organization
     const organizationMember =
         await projectRepository.findMemberByUserId(
@@ -214,27 +217,38 @@ const addProjectMember = async ({
         );
     }
 
-    const member =
-        await projectRepository.createProjectMember(
-            db,
-            {
-                projectId,
-                userId,
+    const member = await db.transaction(async (tx) => {
+        const member = await projectRepository.createProjectMember(tx, {
+            projectId,
+            userId,
+            role,
+        });
+
+        await activityService.log(tx, {
+            projectId,
+            taskId: null,
+            userId: currentUserId,
+            entityType: ENTITY_TYPES.PROJECT,
+            action: ACTIVITY_ACTIONS.MEMBER_ADDED,
+            entityId: member.id,
+            newValue: {
+                memberId: userId,
                 role,
-            }
-        );
+            },
+        });
 
-    // Notification
-    await notificationService.createNotification({
-        userId,
-        type: NOTIFICATION_TYPES.PROJECT_INVITATION,
-        title: NOTIFICATION_TITLES.PROJECT_INVITATION,
-        message: `You have been added to project "${project.name}"`,
-        entityType: ENTITY_TYPES.PROJECT,
-        entityId: project.id,
+        await notificationService.createNotification(tx, {
+            userId,
+            type: NOTIFICATION_TYPES.PROJECT_INVITATION,
+            title: NOTIFICATION_TITLES.PROJECT_INVITATION,
+            message: `You have been added to project "${project.name}"`,
+            entityType: ENTITY_TYPES.PROJECT,
+            entityId: project.id,
+        });
+
+        return member;
     });
-
-    return member;
+    return member
 };
 
 const getProjectMembers = async ({

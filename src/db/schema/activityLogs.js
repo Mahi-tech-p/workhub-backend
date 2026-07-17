@@ -16,6 +16,7 @@ export const entityTypeEnum = pgEnum("entity_type", [
     "LIST",
     "TASK",
     "COMMENT",
+    "ATTACHMENT",
 ]);
 
 export const activityActionEnum = pgEnum("activity_action", [
@@ -25,6 +26,12 @@ export const activityActionEnum = pgEnum("activity_action", [
     "MOVED",
     "COMMENTED",
     "ASSIGNED",
+
+    "MEMBER_ADDED",
+    "MEMBER_REMOVED",
+
+    "ATTACHMENT_UPLOADED",
+    "ATTACHMENT_DELETED",
 ]);
 
 export const activityLogs = pgTable(

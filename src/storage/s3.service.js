@@ -6,7 +6,7 @@ import {
 
 import crypto from "crypto";
 import path from "path";
-import { buildFileUrl } from "../utils/buildFileUrl";
+import { buildFileUrl } from "../utils/buildFileUrl.js";
 
 const s3Client = new S3Client({
     region: process.env.AWS_REGION,

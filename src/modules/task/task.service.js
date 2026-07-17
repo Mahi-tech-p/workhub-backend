@@ -351,7 +351,7 @@ const updateTaskById = async ({
             taskId,
             updateData
         );
-    await activityService.log({
+    await activityService.log(db,{
         projectId: list.projectId,
         taskId: task.id,
         userId,
@@ -649,7 +649,7 @@ const moveTask = async ({
 
     });
     if (sourceList.id !== destinationList.id) {
-        await activityService.log({
+        await activityService.log(tx,{
             projectId: sourceList.projectId,
             taskId: task.id,
             userId,

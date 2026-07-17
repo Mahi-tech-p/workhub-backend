@@ -10,11 +10,14 @@ import {
 } from "../../errors/index.js";
 import activityService from "../activity/activity.service.js";
 import { ACTIVITY_ACTIONS, ENTITY_TYPES } from "../../constants/activity.constants.js";
+import notificationService from "../notifications/notification.service.js";
+import { NOTIFICATION_TYPES } from "../../constants/notification.constants.js";
 
 const createComment = async ({
     taskId,
     content,
     userId,
+    actorName
 }) => {
 
     // Check task exists
@@ -69,16 +72,16 @@ const createComment = async ({
         );
     if (task.assigneeId &&
         task.assigneeId !== userId) {
-        await notificationService.createNotification({
+        await notificationService.createNotification(db,{
             userId: task.assigneeId,
             type: NOTIFICATION_TYPES.COMMENT_ADDED,
             title: "New Comment",
-            message: `${req.user.firstName} commented on "${task.title}"`,
+            message: `${actorName} commented on "${task.title}"`,
             entityType: "TASK",
             entityId: task.id,
         });
     }
-    await activityService.log({
+    await activityService.log(db,{
         projectId: list.projectId,
         taskId,
         userId,
